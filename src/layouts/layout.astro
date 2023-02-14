@@ -13,11 +13,12 @@ const { title = "Pokédex" } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="description" content="Pokédex" />
     <title>{title}</title>
   </head>
-  <body class="bg-zinc-100 text-black font-sans">
+  <body class="bg-zinc-100 dark:bg-black text-black dark:text-white font-sans">
     <header
-      class="w-full sticky top-0 z-50 bg-white px-6 py-4 border-b border-zinc-200 shadow-sm"
+      class="w-full sticky top-0 z-50 bg-white dark:bg-zinc-800 px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 shadow-sm"
     >
       <a href="/">
         <h1 class="font-bold text-xl">Pokédex</h1>
