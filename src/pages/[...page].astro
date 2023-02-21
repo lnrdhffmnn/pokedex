@@ -10,38 +10,39 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
     "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0"
   );
   const json = await res.json();
+  const results: { url: string }[] = json.results;
 
-  const results: { name: string; url: string }[] = json.results;
-  const promises: Promise<any>[] = results.map(result =>
-    fetch(result.url).then(res => res.json())
+  return paginate(
+    results.map(result => result.url),
+    { pageSize: 40 }
   );
+};
 
-  const resolvedPromises = await Promise.all(promises);
-  const pokemons: Pokemon[] = resolvedPromises.map(pokemon => ({
+export interface Props {
+  page: Page<string>;
+}
+
+const { page } = Astro.props;
+
+const promises: Promise<any>[] = page.data.map(url =>
+  fetch(url).then(res => res.json())
+);
+const resolvedPromises = await Promise.all(promises);
+const pokemons: Pokemon[] = resolvedPromises
+  .map(pokemon => ({
     name: pokemon.name,
     image:
       pokemon.sprites.other["official-artwork"].front_default ??
       pokemon.sprites.front_default,
-  }));
-  const filteredPokemons = pokemons.filter(
-    pokemon => pokemon.name && pokemon.image
-  );
-
-  return paginate(filteredPokemons, { pageSize: 20 });
-};
-
-export interface Props {
-  page: Page<Pokemon>;
-}
-
-const { page } = Astro.props;
+  }))
+  .filter(pokemon => pokemon.name && pokemon.image);
 ---
 
 <Layout>
   <div
     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
   >
-    {page.data.map(pokemon => <Card pokemon={pokemon} />)}
+    {pokemons.map(pokemon => <Card pokemon={pokemon} />)}
   </div>
   <div class="w-full flex items-center justify-center gap-4 mt-4">
     {
